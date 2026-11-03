@@ -1,0 +1,123 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-display: 'Bricolage Grotesque', 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+    /* Harbor ink, mist ground, pine accent. Coral is reserved for the map pin. */
+    --color-ink: #0e2233;
+    --color-ink-soft: #46596a;
+    --color-ink-faint: #7a8b99;
+    --color-mist: #f1f5f5;
+    --color-paper: #ffffff;
+    --color-line: #dce4e5;
+    --color-pine: #0f5c52;
+    --color-pine-deep: #0a433b;
+    --color-pine-tint: #e2f0ed;
+    --color-pin: #f0502a;
+    --color-pin-tint: #fde9e3;
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        @apply bg-mist font-sans text-ink antialiased;
+    }
+
+    h1,
+    h2,
+    h3 {
+        @apply font-display tracking-tight;
+    }
+
+    :focus-visible {
+        outline: 2px solid var(--color-pine);
+        outline-offset: 2px;
+    }
+
+    dialog::backdrop {
+        background: rgb(14 34 51 / 0.55);
+    }
+}
+
+@layer components {
+    .card {
+        @apply rounded-2xl border border-line bg-paper;
+    }
+
+    .btn,
+    .btn-primary,
+    .btn-secondary,
+    .btn-danger {
+        @apply inline-flex min-h-10 items-center whitespace-nowrap justify-center gap-2 rounded-xl px-4 py-2 text-sm font-semibold transition
+            disabled:cursor-not-allowed disabled:opacity-60;
+    }
+
+    .btn-primary {
+        @apply bg-pine text-white hover:bg-pine-deep;
+    }
+
+    .btn-secondary {
+        @apply border border-line bg-paper text-ink hover:border-ink-faint hover:bg-mist;
+    }
+
+    .btn-danger {
+        @apply border border-red-200 bg-paper text-red-700 hover:bg-red-50;
+    }
+
+    .btn-link {
+        @apply text-sm font-semibold text-pine underline-offset-4 hover:underline;
+    }
+
+    .btn-lg {
+        @apply min-h-14 rounded-2xl px-6 text-base;
+    }
+
+    .field-label {
+        @apply mb-1.5 block text-sm font-semibold text-ink;
+    }
+
+    .field-hint {
+        @apply mt-1.5 text-xs text-ink-soft;
+    }
+
+    .field {
+        @apply block min-h-11 w-full rounded-xl border border-line bg-paper px-3.5 py-2 text-sm text-ink placeholder:text-ink-faint
+            focus:border-pine focus:outline-none focus:ring-2 focus:ring-pine/20;
+    }
+
+    .field-error {
+        @apply mt-1.5 text-xs font-medium text-red-700;
+    }
+
+    .badge {
+        @apply inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-1 text-xs font-semibold;
+    }
+
+    .badge::before {
+        content: '';
+        @apply size-1.5 rounded-full bg-current;
+    }
+
+    .eyebrow {
+        @apply text-xs font-semibold uppercase tracking-[0.12em] text-ink-faint;
+    }
+
+    .spinner {
+        @apply size-4 animate-spin rounded-full border-2 border-current border-t-transparent;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .spinner {
+        animation-duration: 2.5s;
+    }
+}
