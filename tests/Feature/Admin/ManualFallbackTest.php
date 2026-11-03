@@ -151,6 +151,16 @@ it('tests the Google connection from Settings and reports a clear problem', func
         ->assertSessionHas('error', fn ($message) => str_contains($message, 'rate limit'));
 });
 
+it('does not send clients to Google while the API is not marked as approved', function () {
+    FakeGoogle::configure();
+    GbpAgencySetting::current()->update(['api_approval_status' => 'REQUESTED']);
+    $client = GbpClient::factory()->create(['access_status' => ClientStatus::LinkSent]);
+    $token = GbpOnboardingLink::issue($client)->plainToken();
+
+    $this->get(route('onboarding.show', $token))->assertDontSee('Continue with Google');
+    $this->post(route('onboarding.start', $token))->assertRedirect(route('onboarding.show', $token));
+});
+
 it('does not offer Google sign-in to clients until credentials and the Location Group exist', function () {
     GbpAgencySetting::current()->update(['location_group_account_id' => null]);
     $client = GbpClient::factory()->create(['access_status' => ClientStatus::LinkSent]);

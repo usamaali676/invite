@@ -33,11 +33,17 @@ class GoogleAgencyService
     }
 
     /**
-     * Whether automatic (API) onboarding can be offered to clients right now.
+     * Whether automatic (API) onboarding can be offered to clients right now. Clients are only
+     * sent to Google once the project is marked as approved; before that every API call would
+     * fail after they had already given consent.
      */
     public function canRunAutomaticFlow(): bool
     {
-        return $this->oauth->isConfigured() && $this->settings()->hasLocationGroup();
+        $settings = $this->settings();
+
+        return $this->oauth->isConfigured()
+            && $settings->hasLocationGroup()
+            && $settings->api_approval_status === ApiApprovalStatus::Approved;
     }
 
     /**
