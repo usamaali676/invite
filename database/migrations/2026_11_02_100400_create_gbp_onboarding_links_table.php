@@ -13,7 +13,7 @@ return new class extends Migration
             $table->foreignId('gbp_client_id')->constrained('gbp_clients')->cascadeOnDelete();
             $table->char('token_hash', 64)->unique();
             $table->text('token_encrypted')->nullable();
-            $table->timestamp('expires_at');
+            $table->dateTime('expires_at');
             $table->timestamp('opened_at')->nullable();
             $table->timestamp('used_at')->nullable();
             $table->timestamp('revoked_at')->nullable();
