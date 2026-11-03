@@ -12,7 +12,7 @@ use App\Http\Controllers\Onboarding\OnboardingController;
 use App\Http\Middleware\ResolveOnboardingLink;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/admin');
+Route::get('/', fn () => redirect()->route('admin.dashboard'));
 
 /*
 |--------------------------------------------------------------------------

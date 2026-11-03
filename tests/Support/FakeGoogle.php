@@ -19,6 +19,7 @@ class FakeGoogle
         config([
             'gbp.google.client_id' => 'test-client-id',
             'gbp.google.client_secret' => 'test-secret',
+            'gbp.google.redirect_uri' => null,
         ]);
 
         GbpAgencySetting::current()->update([
