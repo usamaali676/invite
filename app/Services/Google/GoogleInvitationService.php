@@ -28,7 +28,49 @@ class GoogleInvitationService
         private GoogleTokenService $tokens,
         private GoogleAdminService $admins,
         private GoogleAccessVerificationService $verification,
+        private GoogleAgencyService $agency,
     ) {}
+
+    /**
+     * Approve an invitation waiting for the FTS Location Group, then re-check every pending
+     * request for that business so its client moves to Connected as soon as Google confirms it.
+     *
+     * @return array{business: string, connected: array<int, string>, waiting: array<int, string>}
+     *
+     * @throws GoogleApiException
+     * @throws InvalidArgumentException when the invitation is no longer waiting
+     */
+    public function approveAgencyInvitation(string $invitationName, ActorType $actor = ActorType::Admin): array
+    {
+        $invitation = collect($this->agency->pendingInvitations())->firstWhere('name', $invitationName)
+            ?? throw new InvalidArgumentException('That invitation is no longer waiting for approval.');
+
+        $this->agency->acceptInvitation($invitationName);
+
+        $wanted = GoogleAccessVerificationService::normalizeTitle($invitation['location']);
+        $outcome = ['business' => $invitation['location'], 'connected' => [], 'waiting' => []];
+
+        GbpAccessRequest::query()
+            ->with('client')
+            ->whereIn('status', [AccessRequestStatus::Submitted->value, AccessRequestStatus::PendingApproval->value])
+            ->get()
+            ->filter(fn (GbpAccessRequest $request) => $wanted !== ''
+                && GoogleAccessVerificationService::normalizeTitle($request->client->google_location_title ?: $request->client->business_name) === $wanted)
+            ->each(function (GbpAccessRequest $request) use ($actor, $invitationName, &$outcome) {
+                $request->client->logEvent('invitation.approved', $actor, 'The FTS Location Group approved the invitation.', ['invitation' => $invitationName], $request);
+
+                if ($this->verification->refresh($request, $actor)->isConnected()) {
+                    $outcome['connected'][] = $request->client->business_name;
+
+                    return;
+                }
+
+                $outcome['waiting'][] = $request->client->business_name;
+                VerifyAccessRequestJob::dispatch($request->id)->delay(now()->addSeconds(60));
+            });
+
+        return $outcome;
+    }
 
     /**
      * Returns the resulting request. A failure is recorded on the request (status FAILED)

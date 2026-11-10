@@ -123,7 +123,7 @@
                     <div class="mt-5 rounded-xl border border-line bg-mist px-4 py-3 text-sm text-ink-soft">
                         <strong class="text-ink">What happens next:</strong> Google has sent the invitation to the FTS Location Group.
                         It becomes active once someone approves it in Business Profile Manager
-                        (Manage invites &rarr; Approve){{ $agencyConnected ? ', or from Settings > Invitations waiting for FTS' : '' }}.
+                        (Manage invites &rarr; Approve){{ $agencyConnected ? ', or from the Invitations tab' : '' }}.
                         Then press Refresh status.
                     </div>
                 @endif

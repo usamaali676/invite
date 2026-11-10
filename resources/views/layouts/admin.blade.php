@@ -11,13 +11,24 @@
 </head>
 <body class="min-h-screen">
     <header class="border-b border-line bg-paper">
-        <div class="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
+        <div class="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6">
             <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-3">
                 <span class="grid size-9 place-items-center rounded-xl bg-ink font-display text-sm font-bold text-white">{{ config('gbp.agency_short_name') }}</span>
                 <span class="hidden font-display text-base font-bold sm:block">Profile Access</span>
             </a>
             <nav class="flex items-center gap-1 text-sm font-semibold">
                 <a href="{{ route('admin.dashboard') }}" class="rounded-lg px-3 py-2 {{ request()->routeIs('admin.dashboard', 'admin.clients.*') ? 'bg-pine-tint text-pine-deep' : 'text-ink-soft hover:text-ink' }}">Clients</a>
+                @php
+                    $awaitingApprovalCount = \App\Models\GbpClient::query()
+                        ->whereIn('access_status', [\App\Enums\ClientStatus::RequestSubmitted->value, \App\Enums\ClientStatus::PendingApproval->value])
+                        ->count();
+                @endphp
+                <a href="{{ route('admin.invitations.index') }}" class="flex items-center gap-2 rounded-lg px-3 py-2 {{ request()->routeIs('admin.invitations.*') ? 'bg-pine-tint text-pine-deep' : 'text-ink-soft hover:text-ink' }}">
+                    Invitations
+                    @if ($awaitingApprovalCount > 0)
+                        <span class="grid min-w-5 place-items-center rounded-full bg-amber-500 px-1.5 text-xs font-bold leading-5 text-white" aria-label="{{ $awaitingApprovalCount }} awaiting approval">{{ $awaitingApprovalCount }}</span>
+                    @endif
+                </a>
                 <a href="{{ route('admin.settings.edit') }}" class="rounded-lg px-3 py-2 {{ request()->routeIs('admin.settings.*') ? 'bg-pine-tint text-pine-deep' : 'text-ink-soft hover:text-ink' }}">Settings</a>
                 <form method="POST" action="{{ route('logout') }}" data-no-loading>
                     @csrf
@@ -27,7 +38,7 @@
         </div>
     </header>
 
-    <main class="mx-auto max-w-6xl px-4 py-8 sm:px-6">
+    <main class="mx-auto max-w-7xl px-4 py-8 sm:px-6">
         @include('partials.flash')
         @yield('content')
     </main>

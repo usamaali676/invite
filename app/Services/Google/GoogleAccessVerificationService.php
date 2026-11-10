@@ -236,7 +236,7 @@ class GoogleAccessVerificationService
         return $account === '' ? '' : (str_starts_with($account, 'accounts/') ? $account : 'accounts/'.$account);
     }
 
-    private function normalizeTitle(string $title): string
+    public static function normalizeTitle(string $title): string
     {
         return Str::of($title)->lower()->replaceMatches('/[^\p{L}\p{N}]+/u', ' ')->squish()->toString();
     }

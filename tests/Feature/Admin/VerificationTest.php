@@ -170,34 +170,121 @@ it('skips the background check when the request is no longer pending', function 
     Http::assertNothingSent();
 });
 
-it('approves a pending invitation for the Location Group from Settings', function () {
-    FakeGoogle::fake([
-        'GET /invitations' => Http::response(['invitations' => [[
-            'name' => 'accounts/999/invitations/555',
-            'role' => 'MANAGER',
-            'targetLocation' => ['locationName' => 'Test Cafe', 'address' => '1 Main St'],
-        ]]]),
-    ]);
-    GbpGoogleConnection::create([
+function agencyConnection(): GbpGoogleConnection
+{
+    return GbpGoogleConnection::create([
         'connection_type' => ConnectionType::Agency, 'access_token' => 'agency-token', 'refresh_token' => 'agency-refresh',
         'expires_at' => now()->addHour(), 'status' => ConnectionStatus::Active,
     ]);
-    $admin = User::factory()->admin()->create();
+}
 
-    $this->actingAs($admin)->get(route('admin.settings.edit'))->assertOk()->assertSee('Test Cafe')->assertSee('Approve');
+function waitingInvitation(string $title = 'Test Cafe'): array
+{
+    return ['invitations' => [[
+        'name' => 'accounts/999/invitations/555',
+        'role' => 'MANAGER',
+        'targetLocation' => ['locationName' => $title, 'address' => '1 Main St'],
+    ]]];
+}
 
-    $this->actingAs($admin)->post(route('admin.settings.invitations.accept'), ['invitation' => 'accounts/999/invitations/555'])
-        ->assertSessionHas('status');
+it('lists invitations waiting for the Location Group on the Invitations tab', function () {
+    FakeGoogle::fake(['GET /invitations' => Http::response(waitingInvitation())]);
+    agencyConnection();
+    [$client] = pendingRequest();
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('admin.invitations.index'))
+        ->assertOk()
+        ->assertSee('Waiting for your approval')
+        ->assertSee('Test Cafe')
+        ->assertSee('1 Main St')
+        ->assertSee($client->business_name)
+        ->assertSee('Approve');
+});
+
+it('moves the client to Connected as soon as the invitation is approved', function () {
+    FakeGoogle::fake([
+        'GET /invitations' => Http::response(waitingInvitation()),
+        'GET /admins' => Http::response(['admins' => [FakeGoogle::admin(pending: false)]]),
+    ]);
+    agencyConnection();
+    [$client, $request] = pendingRequest();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->post(route('admin.invitations.accept'), ['invitation' => 'accounts/999/invitations/555'])
+        ->assertSessionHas('status', fn ($message) => str_contains($message, 'is now connected'));
 
     Http::assertSent(fn ($r) => $r->method() === 'POST'
         && $r->url() === 'https://mybusinessaccountmanagement.googleapis.com/v1/accounts/999/invitations/555:accept'
         && $r->hasHeader('Authorization', 'Bearer agency-token'));
+
+    expect($client->fresh()->access_status)->toBe(ClientStatus::Connected)
+        ->and($request->fresh()->status)->toBe(AccessRequestStatus::Connected)
+        ->and($client->logs()->where('action', 'invitation.approved')->exists())->toBeTrue();
+});
+
+it('keeps the client pending and re-checks later when Google does not show the access yet', function () {
+    Queue::fake();
+    FakeGoogle::fake([
+        'GET /invitations' => Http::response(waitingInvitation()),
+        'GET /admins' => Http::response(['admins' => [FakeGoogle::admin(pending: true)]]),
+        'GET mybusinessbusinessinformation' => Http::response(['locations' => []]),
+    ]);
+    agencyConnection();
+    [$client, $request] = pendingRequest();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->post(route('admin.invitations.accept'), ['invitation' => 'accounts/999/invitations/555'])
+        ->assertSessionHas('notice');
+
+    expect($client->fresh()->access_status)->toBe(ClientStatus::PendingApproval);
+    Queue::assertPushed(VerifyAccessRequestJob::class, fn ($job) => $job->accessRequestId === $request->id);
+});
+
+it('does not touch clients whose business has a different name', function () {
+    FakeGoogle::fake(['GET /invitations' => Http::response(waitingInvitation('Some Other Shop'))]);
+    agencyConnection();
+    [$client] = pendingRequest();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->post(route('admin.invitations.accept'), ['invitation' => 'accounts/999/invitations/555'])
+        ->assertSessionHas('status');
+
+    expect($client->fresh()->access_status)->toBe(ClientStatus::PendingApproval);
+});
+
+it('refuses an invitation that is no longer waiting', function () {
+    FakeGoogle::fake(['GET /invitations' => Http::response(['invitations' => []])]);
+    agencyConnection();
+
+    $this->actingAs(User::factory()->admin()->create())
+        ->post(route('admin.invitations.accept'), ['invitation' => 'accounts/999/invitations/555'])
+        ->assertSessionHas('error', fn ($message) => str_contains($message, 'no longer waiting'));
+
+    Http::assertNotSent(fn ($r) => str_contains($r->url(), ':accept'));
+});
+
+it('explains on the Invitations tab that the FTS Google account must be connected', function () {
+    Http::preventStrayRequests();
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('admin.invitations.index'))
+        ->assertOk()
+        ->assertSee('Connect the FTS Google account in Settings')
+        ->assertSee("Invitations can't be loaded yet");
 });
 
 it('rejects a malformed invitation name', function () {
     FakeGoogle::fake();
 
     $this->actingAs(User::factory()->admin()->create())
-        ->post(route('admin.settings.invitations.accept'), ['invitation' => '../../evil'])
+        ->post(route('admin.invitations.accept'), ['invitation' => '../../evil'])
         ->assertSessionHasErrors('invitation');
+});
+
+it('shows how many clients wait for approval on the Invitations tab', function () {
+    Http::preventStrayRequests();
+    pendingRequest();
+
+    $this->actingAs(User::factory()->admin()->create())->get(route('admin.dashboard'))
+        ->assertOk()
+        ->assertSee('aria-label="1 awaiting approval"', false);
 });

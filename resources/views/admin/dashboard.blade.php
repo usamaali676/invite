@@ -88,11 +88,11 @@
                                     <a href="{{ route('admin.clients.show', $client) }}" class="font-semibold hover:text-pine">{{ $client->business_name }}</a>
                                     @if ($client->client_name)<div class="text-xs text-ink-soft">{{ $client->client_name }}</div>@endif
                                 </td>
-                                <td class="block text-ink-soft xl:table-cell xl:px-4 xl:py-3">{{ $client->client_email ?: '—' }}</td>
+                                <td class="block text-ink-soft xl:table-cell xl:px-4 xl:py-3"><span class="block max-w-[13rem] truncate" title="{{ $client->client_email }}">{{ $client->client_email ?: '—' }}</span></td>
                                 <td class="block xl:table-cell xl:px-4 xl:py-3">
                                     @if ($client->google_location_title)
-                                        <div class="font-medium">{{ $client->google_location_title }}</div>
-                                        <div class="max-w-[14rem] truncate text-xs text-ink-soft">{{ $client->google_location_address }}</div>
+                                        <div class="max-w-[15rem] truncate font-medium" title="{{ $client->google_location_title }}">{{ $client->google_location_title }}</div>
+                                        <div class="max-w-[15rem] truncate text-xs text-ink-soft" title="{{ $client->google_location_address }}">{{ $client->google_location_address }}</div>
                                     @elseif ($client->google_maps_url)
                                         <a href="{{ $client->google_maps_url }}" target="_blank" rel="noopener noreferrer" class="btn-link">Open in Maps</a>
                                     @else
@@ -113,10 +113,10 @@
                                                 <button class="btn-secondary" type="submit">Generate link</button>
                                             </form>
                                         @endif
-                                        <a href="{{ route('admin.clients.show', $client) }}" class="btn-secondary">View</a>
                                         <details class="relative">
                                             <summary class="btn-secondary cursor-pointer list-none" aria-label="More actions for {{ $client->business_name }}">More</summary>
                                             <div class="absolute right-0 z-10 mt-2 w-56 space-y-1 rounded-xl border border-line bg-paper p-2 text-left shadow-lg">
+                                                <a href="{{ route('admin.clients.show', $client) }}" class="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-mist">View client</a>
                                                 <a href="{{ route('admin.clients.edit', $client) }}" class="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-mist">Edit details</a>
                                                 <a href="{{ route('admin.clients.show', $client) }}#access" class="block rounded-lg px-3 py-2 text-sm font-medium hover:bg-mist">View access status</a>
                                                 @if ($linkUrl && $client->client_email)

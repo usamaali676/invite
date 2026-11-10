@@ -84,7 +84,7 @@ Read these first; Google changes them: [prerequisites](https://developers.google
 5. The result is **verified** by reading `locations/{id}/admins` with the client token, or by checking the Location Group's locations with the FTS token. `CONNECTED` is set only when Google shows the group as Manager (or higher) with no pending invitation. Otherwise the client stays `PENDING_APPROVAL`.
 6. Once connected, the client's Google token is revoked and deleted.
 
-**Agency-side approval.** An invitation to a Location Group may need FTS to approve it. With the FTS Google account connected, **Settings > Invitations waiting for FTS** lists them with an Approve button (`accounts/{id}/invitations` and `:accept`). Without it, approve in Business Profile Manager (Manage invites > Approve). Then press **Refresh status** on the client. The scheduler also checks every 30 minutes.
+**Agency-side approval.** An invitation to a Location Group may need FTS to approve it. With the FTS Google account connected, the **Invitations** tab lists them with an Approve button (`accounts/{id}/invitations` and `:accept`). Approving re-checks Google at once and moves the matching client to **Connected** when Google confirms the access. Without the connected account, approve in Business Profile Manager (Manage invites > Approve), then press **Refresh status** on the client. The scheduler also checks every 30 minutes.
 
 **Who can invite.** Google only lets an Owner or Primary Owner of the location add a manager. A client without that role gets a failure (`PERMISSION_DENIED`) and staff see a plain-English reason. The client sees only the friendly error message.
 

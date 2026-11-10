@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\ClientAccessController;
 use App\Http\Controllers\Admin\ClientController;
 use App\Http\Controllers\Admin\ClientLinkController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\InvitationController;
 use App\Http\Controllers\Admin\SettingsController;
 use App\Http\Controllers\GoogleCallbackController;
 use App\Http\Controllers\Onboarding\OnboardingController;
@@ -80,7 +81,8 @@ Route::prefix('admin')->middleware(['auth', 'can:manage-gbp'])->name('admin.')->
     Route::get('settings', [SettingsController::class, 'edit'])->name('settings.edit');
     Route::put('settings', [SettingsController::class, 'update'])->name('settings.update');
     Route::post('settings/test', [SettingsController::class, 'test'])->name('settings.test');
-    Route::post('settings/invitations/accept', [SettingsController::class, 'acceptInvitation'])->name('settings.invitations.accept');
+    Route::get('invitations', [InvitationController::class, 'index'])->name('invitations.index');
+    Route::post('invitations/accept', [InvitationController::class, 'accept'])->name('invitations.accept');
 
     Route::get('settings/google/connect', [AgencyGoogleController::class, 'connect'])->name('settings.google.connect');
     Route::post('settings/google/disconnect', [AgencyGoogleController::class, 'disconnect'])->name('settings.google.disconnect');

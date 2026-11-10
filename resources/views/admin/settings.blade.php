@@ -40,37 +40,6 @@
                 </div>
                 <button class="btn-primary" type="submit"><span data-label>Save settings</span></button>
             </form>
-
-            @if ($connection)
-                <section class="card p-6">
-                    <h2 class="text-lg font-bold">Invitations waiting for FTS</h2>
-                    <p class="mt-1 text-sm text-ink-soft">When a client invites the Location Group, Google may need FTS to approve it. Approve it here once you know the request is expected.</p>
-                    @if ($invitationError)
-                        <p class="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{{ $invitationError }}</p>
-                    @elseif (! $settings->hasLocationGroup())
-                        <p class="mt-4 text-sm text-ink-soft">Save the Location Group ID first.</p>
-                    @elseif (empty($invitations))
-                        <p class="mt-4 text-sm text-ink-soft">No invitations are waiting.</p>
-                    @else
-                        <ul class="mt-4 divide-y divide-line">
-                            @foreach ($invitations as $invitation)
-                                <li class="flex flex-wrap items-center justify-between gap-3 py-3">
-                                    <div class="min-w-0">
-                                        <p class="font-semibold">{{ $invitation['location'] ?: 'Unnamed business' }}</p>
-                                        <p class="truncate text-xs text-ink-soft">{{ $invitation['address'] ?: 'No address shown' }} · {{ $invitation['role'] ?? 'MANAGER' }}</p>
-                                    </div>
-                                    <form method="POST" action="{{ route('admin.settings.invitations.accept') }}" data-loading
-                                          data-confirm="Approve the invitation for {{ $invitation['location'] }}? The FTS Location Group will gain {{ $invitation['role'] ?? 'Manager' }} access." data-confirm-title="Approve invitation?" data-confirm-ok="Approve">
-                                        @csrf
-                                        <input type="hidden" name="invitation" value="{{ $invitation['name'] }}">
-                                        <button class="btn-primary" type="submit">Approve</button>
-                                    </form>
-                                </li>
-                            @endforeach
-                        </ul>
-                    @endif
-                </section>
-            @endif
         </div>
 
         <div class="space-y-6 lg:col-span-2">
