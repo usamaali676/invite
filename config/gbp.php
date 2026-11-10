@@ -54,6 +54,12 @@ return [
     */
     'business_profile_manager_url' => 'https://www.google.com/business/',
 
+    /*
+    | Opened for the client after they finish, so they can see the request
+    | under People and access in their own Business Profile.
+    */
+    'client_profile_url' => 'https://business.google.com/locations',
+
     'verification' => [
         'schedule_every_minutes' => 30,
         'first_check_delay_seconds' => 90,

@@ -229,10 +229,16 @@ it('shows the success message right after submitting, then the pending message',
     $this->post(route('onboarding.authorize', $token), ['authorize' => 1]);
 
     $this->get(route('onboarding.show', $token))
-        ->assertSee('Your request has been submitted successfully. Firm Tech Services will now complete the required access confirmation.');
+        ->assertSee("You're all done!")
+        ->assertSee('Your request has been submitted successfully. Firm Tech Services will now complete the required access confirmation.')
+        ->assertSee('Nothing else is needed from you.')
+        ->assertSee('Open my Google Business Profile')
+        ->assertSee('window.open(link.href', false);
 
     $this->get(route('onboarding.show', $token))
-        ->assertSee('Your Google access request is awaiting approval. There is nothing else you need to do right now.');
+        ->assertSee('Your Google access request is awaiting approval. There is nothing else you need to do right now.')
+        ->assertSee('Open my Google Business Profile')
+        ->assertDontSee('window.open(link.href', false);
 });
 
 it('does not call the client connected just because Google accepted the POST', function () {

@@ -29,5 +29,6 @@
             <p class="mt-1">We never see your Google password. Google handles sign-in and asks for your permission.</p>
         </footer>
     </div>
+    @stack('scripts')
 </body>
 </html>
