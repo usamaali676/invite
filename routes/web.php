@@ -28,6 +28,14 @@ Route::post('/logout', [AuthController::class, 'destroy'])->middleware('auth')->
 
 /*
 |--------------------------------------------------------------------------
+| Public legal pages (also required by Google's OAuth verification)
+|--------------------------------------------------------------------------
+*/
+Route::view('/privacy', 'legal.privacy')->name('legal.privacy');
+Route::view('/terms', 'legal.terms')->name('legal.terms');
+
+/*
+|--------------------------------------------------------------------------
 | Google OAuth redirect URI (one URI for agency and client flows)
 |--------------------------------------------------------------------------
 */

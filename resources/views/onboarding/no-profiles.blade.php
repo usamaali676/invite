@@ -9,6 +9,7 @@
             The Google account you signed in with doesn't manage any business listings. This often happens when a different Google account owns the listing.
             Nothing on your Google Business Profile has been changed.
         </p>
+        @include('onboarding.partials.signed-in')
         <ul class="mt-5 list-disc space-y-1.5 pl-5 text-sm text-ink-soft">
             <li>Try again and choose the Google account you use for your business.</li>
             <li>Or contact us and we'll help you find the right account.</li>

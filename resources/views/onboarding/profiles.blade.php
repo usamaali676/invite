@@ -6,6 +6,7 @@
     <div class="card p-6 sm:p-8">
         <h1 class="text-3xl font-bold leading-tight">Which business is yours?</h1>
         <p class="mt-3 leading-relaxed text-ink-soft">We found these business listings in your Google account. Choose the one for <strong class="text-ink">{{ $client->business_name }}</strong>.</p>
+        @include('onboarding.partials.signed-in')
 
         <form method="POST" action="{{ route('onboarding.select', ['token' => $token]) }}" data-loading class="mt-6">
             @csrf

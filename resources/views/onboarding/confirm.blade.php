@@ -6,6 +6,7 @@
     <div class="card p-6 sm:p-8">
         <h1 class="text-3xl font-bold leading-tight">Confirm your request</h1>
         <p class="mt-3 leading-relaxed text-ink-soft">Please confirm that you want to allow {{ $agency }} to request Manager access to the following business.</p>
+        @include('onboarding.partials.signed-in')
 
         <dl class="mt-6 divide-y divide-line rounded-2xl border border-line">
             <div class="p-4">
@@ -35,6 +36,7 @@
             @error('authorize')<p class="field-error">{{ $message }}</p>@enderror
 
             <button type="submit" class="btn-primary btn-lg mt-6 w-full"><span data-label>Authorize Manager Access Request</span></button>
+            <p class="mt-3 text-center text-xs leading-relaxed text-ink-soft">You stay the owner and can remove our access at any time under People and access in your Business Profile.</p>
         </form>
 
         <p class="mt-5 text-center text-sm">

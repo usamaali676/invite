@@ -117,7 +117,7 @@ class OnboardingController extends Controller
         if ($listing === []) {
             $client->logEvent('profiles.none', ActorType::Client, 'No Business Profile was found for the signed-in Google account.');
 
-            return view('onboarding.no-profiles', $this->shared($client, 2));
+            return view('onboarding.no-profiles', $this->shared($client, 2) + ['googleName' => $connection->google_account_name]);
         }
 
         $request->session()->put('gbp.single.'.$link->id, count($listing) === 1);
@@ -131,6 +131,7 @@ class OnboardingController extends Controller
         return view('onboarding.profiles', $this->shared($client, 2) + [
             'locations' => $listing,
             'selected' => $client->location_resource_name,
+            'googleName' => $connection->google_account_name,
         ]);
     }
 
@@ -175,6 +176,7 @@ class OnboardingController extends Controller
 
         return view('onboarding.confirm', $this->shared($client, 3) + [
             'only' => (bool) $request->session()->get('gbp.single.'.$link->id),
+            'googleName' => $connection->google_account_name,
         ]);
     }
 

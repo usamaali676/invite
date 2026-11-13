@@ -13,6 +13,19 @@ return [
     'support_phone' => env('GBP_SUPPORT_PHONE'),
 
     /*
+    | Real company details shown on every client page. Fill in as many as you can:
+    | visitors trust a page more when they can see who is behind it.
+    */
+    'company_website' => env('GBP_COMPANY_WEBSITE'),
+    'company_address' => env('GBP_COMPANY_ADDRESS'),
+
+    /*
+    | Set GBP_GOOGLE_APP_VERIFIED=true once Google has verified the OAuth app. Until then
+    | clients may see Google's "unverified app" notice, so the landing page explains it.
+    */
+    'google_app_verified' => (bool) env('GBP_GOOGLE_APP_VERIFIED', false),
+
+    /*
     |--------------------------------------------------------------------------
     | Onboarding links
     |--------------------------------------------------------------------------

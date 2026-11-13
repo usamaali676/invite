@@ -25,7 +25,7 @@ it('rejects an expired link and marks the client expired', function () {
     $link = GbpOnboardingLink::issue($client);
     $link->update(['expires_at' => now()->subSecond()]);
 
-    $this->get(route('onboarding.show', $link->plainToken()))->assertNotFound()->assertSee("This link isn't available", false);
+    $this->get(route('onboarding.show', $link->plainToken()))->assertNotFound()->assertSee("This link isn't working", false);
 
     expect($client->fresh()->access_status)->toBe(ClientStatus::Expired);
 });

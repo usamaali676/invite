@@ -60,6 +60,21 @@
                             <button class="btn-danger" type="submit">Revoke link</button>
                         </form>
                     </div>
+
+                    @php
+                        $firstName = \Illuminate\Support\Str::of((string) $client->client_name)->trim()->before(' ')->toString();
+                        $shareMessage = ($firstName !== '' ? "Hi {$firstName}," : 'Hello,')."\n\n"
+                            ."This is ".auth()->user()->name." from ".config('gbp.agency_name').". To start managing the Google Business Profile for {$client->business_name}, please open your personal link below. It takes about 2 minutes.\n\n"
+                            .$linkUrl."\n\n"
+                            ."You sign in on Google's own page, we never see your password, and you stay the owner of your profile. You can remove our access any time.\n\n"
+                            ."Questions? Reply here".(config('gbp.support_phone') ? ' or call '.config('gbp.support_phone') : '').'.';
+                    @endphp
+                    <details class="mt-5 border-t border-line pt-4">
+                        <summary class="cursor-pointer text-sm font-semibold text-pine">Message to send with the link</summary>
+                        <p class="mt-2 text-xs text-ink-soft">A personal message makes the link feel safe. It works for WhatsApp, SMS and email.</p>
+                        <textarea id="share-message" readonly rows="9" onclick="this.select()" class="field mt-2 text-sm leading-relaxed">{{ $shareMessage }}</textarea>
+                        <button type="button" class="btn-secondary mt-2" data-copy="#share-message"><span data-copy-label>Copy message</span></button>
+                    </details>
                 @else
                     <p class="mt-1 text-sm text-ink-soft">
                         {{ $link ? 'The previous link is no longer valid.' : 'No link has been created yet.' }}
